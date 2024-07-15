@@ -41,15 +41,15 @@ const item = {
     initial="hidden"
     animate="visible"
   >
-    <div className='text-center bg-slate-400 p-10 rounded-lg ml-40 mr-40'>
+    <div className='sm:ml-40  sm:mr-40 text-center bg-slate-400 p-10 rounded-lg '>
       {data.map((habit, idx) => (
         <motion.div className='flex justify-evenly' key={idx} variants={item}>
-          <ul>
+          <ul className='align-middle'>
             <li className={complete[idx] ? 'line-through' : ''}>
-              <b>{habit}</b>
+              <b className='col-start-1 col-end-2 align-sub sm:'>{habit}</b>
             </li>
           </ul>
-          <div>
+          <div className=''>
           <button
             onClick={() => handleDone(idx)}
             className='text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2'
