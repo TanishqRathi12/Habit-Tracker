@@ -1,0 +1,173 @@
+import { useEffect, useState } from 'react';
+import './App.css';
+import HabitInput from './Components/HabitInput';
+import HabitList from './Components/HabitList';
+import Header from './Components/Header';
+
+function App() {
+const [inputs,setInputs] =useState(()=>{
+const save = localStorage.getItem('inputs')
+return save ? JSON.parse(save) : []
+});
+
+  const getData=(argu)=>{
+    setInputs([...inputs,argu]);
+  }
+  useEffect(()=>{
+    localStorage.setItem('inputs',JSON.stringify(inputs))
+  },[inputs])
+  return (
+    <div className='bg-slate-700 pb-80'>
+    <>
+    <Header></Header>
+    <HabitInput onSubmit={getData}></HabitInput>
+    <HabitList data={inputs}></HabitList>
+    </>
+    </div>
+  );
+
+}
+
+export default App;
+
+
+import React, { useState } from 'react'
+
+function HabitInput(props) {
+    const [habit,setHabit] = useState('')
+    let handleChange=(e)=>{
+        setHabit(e.target.value);
+    }
+    let handleSubmit=(e)=>{
+        e.preventDefault();
+        props.onSubmit(habit);
+        setHabit('')
+    }
+  return (
+    <div className=' bg-white rounded-lg m-10' >
+        <div className='p-10'>
+        <form onSubmit={handleSubmit} className='grid grid-cols-12 gap-10'>
+        <input required type="text" onChange={handleChange} value={habit} className=' col-start-4 c col-end-8 w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-emerald-600 sm:text-sm sm:leading-6'  name='Add' placeholder='Enter your habit..' />
+        <input type="submit" value="Add"  className='grid col-start-8 col-end-10 text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center  text-center align-middle'/>
+        </form>
+        </div>
+    </div>
+  )
+}
+
+export default HabitInput
+
+
+import React, { useState } from 'react';
+import ProgressSummary from './ProgressSummary';
+import { motion } from "framer-motion"
+
+function HabitList({ data }) {
+  const [complete, setComplete] = useState(Array(data.length).fill(false));
+
+  const handleDone = (idx) => {
+    const Com = [...complete];
+    Com[idx] = !Com[idx];
+    setComplete(Com);
+  };
+  const container = {
+  hidden: { opacity: 1, scale: 0 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      delayChildren: 0.3,
+      staggerChildren: 0.2
+    }
+  }
+}
+  
+const item = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1
+  }
+}
+
+  return (
+    <motion.ul
+    className="container"
+    variants={container}
+    initial="hidden"
+    animate="visible"
+  >
+    <div className='text-center bg-slate-400 p-10 rounded-lg ml-40 mr-40'>
+      {data.map((habit, idx) => (
+        <motion.div className='flex justify-evenly' key={idx} variants={item}>
+          <ul>
+            <li className={complete[idx] ? 'line-through' : ''}>
+              <b>{habit}</b>
+            </li>
+          </ul>
+          <button
+            onClick={() => handleDone(idx)}
+            className='text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2'
+          >
+            Mark Done
+          </button>
+        </motion.div>
+      ))}
+      <ProgressSummary complete={complete} />
+    </div> 
+    </motion.ul>
+  );
+}
+
+export default HabitList;
+
+
+import React from 'react'
+
+function Header() {
+  return (
+    <div className='bg-teal-600'>
+      <h1 className='p-10 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-5xl text-center'>Habit Tracker</h1>
+    </div>
+  )
+}
+
+export default Header
+
+
+import React from 'react';
+
+function ProgressSummary({ complete }) {
+  const completedCount = complete.filter(hoLa => hoLa).length;
+  const totalCount = complete.length;
+  const progress = Math.floor((completedCount / totalCount)*100);
+ 
+  return (
+    <div className="text-center mt-4">
+      <p className=' text-blue-800 text-2xl font-semibold me-2 px-2.5 py-0.5 rounded dark:text-blue-800 ms-2'><b>{progress}% Completed</b></p>
+      <div className="relative pt-1">
+        <div className="flex mb-2 items-center justify-between">
+          
+          <div>
+            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+              Progress
+            </span>
+          </div>
+          <div className="text-right">
+            <span className="text-xs font-semibold inline-block text-blue-600">
+              {completedCount}/{totalCount}
+            </span>
+          </div>
+        </div>
+        <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">         
+          <div
+            style={{ width: `${progress}%` }}
+            className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600"
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ProgressSummary;
